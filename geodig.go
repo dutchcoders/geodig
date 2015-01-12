@@ -104,6 +104,8 @@ func main() {
 	flag.BoolVar(&verbose, "verbose", false, "verbose")
 	flag.Parse()
 
+	format = strings.Replace(format, "\\n", "\n", -1)
+
 	fi, err := os.Stdin.Stat()
 	if err != nil {
 		panic(err)
