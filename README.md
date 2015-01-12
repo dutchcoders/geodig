@@ -23,6 +23,39 @@ $echo 192.30.252.131|geodig
 United States (San Francisco)%
 ```
 
+Analyzing log files
+```
+$curl http://#####.###/logs/access.log | awk '{print $1}' | sort | uniq | go run geodig.go --format "(country)\n"| sort | uniq
+Afghanistan
+Australia
+Belarus
+Bulgaria
+Canada
+China
+Finland
+France
+Germany
+India
+Indonesia
+Ireland
+Israel
+Netherlands
+Poland
+Romania
+Russia
+Rwanda
+Spain
+Thailand
+Ukraine
+United Kingdom
+United States
+```
+
+Creating a shell alias 
+```
+$alias geodig='go run geodig.go --format "(country)\n"'
+```
+
 ## Contributions
 
 Contributions are welcome.
