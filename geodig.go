@@ -10,6 +10,8 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"os/user"
+	"path"
 	"strings"
 )
 
@@ -31,64 +33,88 @@ type geoIPResult struct {
 	} `maxminddb:"country"`
 }
 
+// create ~/.geodig folder, and download geolite db
 func init() {
-	// download database
-	path := "/tmp/GeoLite2-City.mmdb"
+	var err error
+	var usr *user.User
+	if usr, err = user.Current(); err != nil {
+		panic(err)
+	}
 
-	_, err := os.Stat(path)
+	geodig_path := path.Join(usr.HomeDir, ".geodig")
+
+	_, err = os.Stat(geodig_path)
+
+	switch {
+	case err == nil:
+		break
+	case os.IsNotExist(err):
+		if err = os.Mkdir(geodig_path, 0755); err != nil {
+			panic(err)
+		}
+	default:
+		panic(err)
+
+	}
+
+	db_path := path.Join(geodig_path, "GeoLite2-City.mmdb")
+
+	_, err = os.Stat(db_path)
 	if os.IsNotExist(err) {
-		fmt.Println("Downloading database")
-
-		client := &http.Client{}
-
-		req, err := http.NewRequest("GET", geoLiteURL, nil)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+		if verbose {
+			fmt.Println("Downloading database")
 		}
 
-		var resp *http.Response
-		if resp, err = client.Do(req); err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
-		defer resp.Body.Close()
-
-		gzf, err := gzip.NewReader(resp.Body)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		defer gzf.Close()
-
-		f, err := os.Create(path)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
-		defer f.Close()
-
-		_, err = io.Copy(f, gzf)
-		if err != nil {
+		if err = download(geoLiteURL, db_path); err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 	}
 
 	if verbose {
-		fmt.Printf("Using database %s.\n", path)
+		fmt.Printf("Using database %s.\n", db_path)
 	}
 
-	reader, err = maxminddb.Open(path)
+	reader, err = maxminddb.Open(db_path)
 }
 
 func help() {
 	fmt.Println("No ip addresses")
 }
 
-func update() error {
+func download(url string, dest string) error {
+	client := &http.Client{}
+
+	req, err := http.NewRequest("GET", geoLiteURL, nil)
+	if err != nil {
+		return err
+	}
+
+	var resp *http.Response
+	if resp, err = client.Do(req); err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+
+	gzf, err := gzip.NewReader(resp.Body)
+	if err != nil {
+		return err
+	}
+	defer gzf.Close()
+
+	f, err := os.Create(dest)
+	if err != nil {
+		return err
+	}
+
+	defer f.Close()
+
+	_, err = io.Copy(f, gzf)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
