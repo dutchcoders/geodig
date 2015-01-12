@@ -2,7 +2,7 @@
 Command line tool for looking up Geolocation info for an ip address.
 
 ## Database
-geodig uses the great MaxMind database.
+This product includes GeoLite data created by MaxMind, available from [http://www.maxmind.com/](http://www.maxmind.com).
 
 ## Build
 ```
