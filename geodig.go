@@ -5,7 +5,6 @@ import (
 	"compress/gzip"
 	"flag"
 	"fmt"
-	"github.com/oschwald/maxminddb-golang"
 	"io"
 	"net"
 	"net/http"
@@ -13,6 +12,8 @@ import (
 	"os/user"
 	"path"
 	"strings"
+
+	"github.com/oschwald/maxminddb-golang"
 )
 
 var reader *maxminddb.Reader
@@ -160,8 +161,12 @@ func main() {
 		var addr net.IP
 		addr = net.ParseIP(arg)
 		if addr == nil {
-			fmt.Printf("%s is not a valid ip address", addr)
-			continue
+			if ips, err := net.LookupIP(arg); err != nil {
+				fmt.Printf("%s is not a valid ip address or host.", arg)
+				continue
+			} else {
+				addr = ips[0]
+			}
 		}
 
 		var result geoIPResult
