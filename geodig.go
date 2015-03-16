@@ -122,11 +122,6 @@ func download(url string, dest string) error {
 const geoLiteURL = "http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz"
 
 func main() {
-	// initial download
-	// update
-	// open from cache
-	// resolve
-
 	flag.StringVar(&format, "format", "(country) ((city))", "format")
 	flag.BoolVar(&verbose, "verbose", false, "verbose")
 	flag.Parse()
@@ -158,11 +153,12 @@ func main() {
 	}
 
 	for _, arg := range args {
+		arg = strings.Trim(arg, "\n\t ")
 		var addr net.IP
 		addr = net.ParseIP(arg)
 		if addr == nil {
 			if ips, err := net.LookupIP(arg); err != nil {
-				fmt.Printf("%s is not a valid ip address or host.", arg)
+				fmt.Fprintf(os.Stderr, "%s is not a valid ip address or host %s.\n", arg, err)
 				continue
 			} else {
 				addr = ips[0]
