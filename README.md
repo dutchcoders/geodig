@@ -9,6 +9,13 @@ This product includes GeoLite data created by MaxMind, available from [http://ww
 $go build -o geodig geodig.go
 ```
 
+## Install using Homebrew
+
+```
+$ brew tap dutchcoders/homebrew-geodig
+$ brew install geodig
+```
+
 ## Examples
 
 Get location for ip address
@@ -69,4 +76,5 @@ Contributions are welcome.
 ## Copyright and license
 
 Code and documentation copyright 2011-2014 Remco Verhoef.
+
 Code released under [the MIT license](LICENSE).
