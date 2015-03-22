@@ -4,9 +4,13 @@ Command line tool for looking up Geolocation info for an ip address.
 ## Database
 This product includes GeoLite data created by MaxMind, available from [http://www.maxmind.com/](http://www.maxmind.com).
 
+## Demo
+
+![](demo.gif)
+
 ## Build
 ```
-$go build -o geodig geodig.go
+$ go build -o geodig geodig.go
 ```
 
 ## Install using Homebrew
